@@ -1,5 +1,7 @@
 package sonya
 
+import "net/url"
+
 // GetCurrentUser returns the user object of the requester's account.
 // For OAuth2, this requires the identify scope,
 // which will return the object without an email,
@@ -36,6 +38,24 @@ type ModifyCurrentUserOption interface {
 	optModifyCurrentUser(v map[string]interface{})
 }
 
+// GetCurrentUserGuilds returns a list of partial guild objects the current user is a member of.
+// Requires the guilds OAuth2 scope.
+//
+// https://discord.com/developers/docs/resources/user#get-current-user-guilds
+func (s *Session) GetCurrentUserGuilds(opts ...GetCurrentUserGuildsOption) ([]*Guild, error) {
+	guilds := make([]*Guild, 0, 200)
+	v := url.Values{}
+	for _, opt := range opts {
+		opt.optGetCurrentUserGuilds(v)
+	}
+	return guilds, s.get("/users/@me/guilds?"+v.Encode(), &guilds)
+}
+
+type GetCurrentUserGuildsOption interface {
+	optGetCurrentUserGuilds(v url.Values)
+}
+
+// https://discord.com/developers/docs/resources/user#user-object-user-structure
 type User struct {
 	ID          SnowflakeUser `json:"id"`
 	Username    string        `json:"username"`
@@ -54,6 +74,7 @@ type User struct {
 	PublicFlags *int          `json:"public_flags"`
 }
 
+// https://discord.com/developers/docs/resources/user#user-object-user-flags
 type UserFlag int
 
 const (

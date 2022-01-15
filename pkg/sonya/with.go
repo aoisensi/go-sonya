@@ -8,6 +8,8 @@ import (
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
+	"net/url"
+	"strconv"
 )
 
 type WithAvatar []byte
@@ -29,4 +31,22 @@ type WithUsername string
 
 func (w WithUsername) optModifyCurrentUser(v map[string]interface{}) {
 	v["username"] = string(w)
+}
+
+type WithBefore Snowflake
+
+func (w WithBefore) optGetCurrentUserGuilds(v url.Values) {
+	v.Set("before", string(w))
+}
+
+type WithAfter Snowflake
+
+func (w WithAfter) optGetCurrentUserGuilds(v url.Values) {
+	v.Set("after", string(w))
+}
+
+type WithLimit int
+
+func (w WithLimit) optGetCurrentUserGuilds(v url.Values) {
+	v.Set("limit", strconv.Itoa(int(w)))
 }
