@@ -9,23 +9,27 @@ import "net/url"
 // which returns the object with an email.
 //
 // https://discord.com/developers/docs/resources/user#get-current-user
-func (s *Session) GetCurrentUser() (*User, error) {
-	return s.GetUser("@me")
+func (s *Discord) GetCurrentUser() (*User, error) {
+	return s.getUser("@me")
 }
 
 // GetUser returns a user object for a given user ID.
 //
 // https://discord.com/developers/docs/resources/user#get-user
-func (s *Session) GetUser(id SnowflakeUser) (*User, error) {
+func (s *Discord) GetUser(id SnowflakeUser) (*User, error) {
+	return s.getUser(id.String())
+}
+
+func (s *Discord) getUser(id string) (*User, error) {
 	user := new(User)
-	return user, s.get("/users/"+id.String(), user)
+	return user, s.get("/users/"+id, user)
 }
 
 // ModifyCurrentUser modify the requester's user account settings.
 // Returns a user object on success.
 //
 // https://discord.com/developers/docs/resources/user#modify-current-user
-func (s *Session) ModifyCurrentUser(opts ...ModifyCurrentUserOption) (*User, error) {
+func (s *Discord) ModifyCurrentUser(opts ...ModifyCurrentUserOption) (*User, error) {
 	user := new(User)
 	j := make(map[string]interface{})
 	for _, opt := range opts {
@@ -42,7 +46,7 @@ type ModifyCurrentUserOption interface {
 // Requires the guilds OAuth2 scope.
 //
 // https://discord.com/developers/docs/resources/user#get-current-user-guilds
-func (s *Session) GetCurrentUserGuilds(opts ...GetCurrentUserGuildsOption) ([]*Guild, error) {
+func (s *Discord) GetCurrentUserGuilds(opts ...GetCurrentUserGuildsOption) ([]*Guild, error) {
 	guilds := make([]*Guild, 0, 200)
 	v := url.Values{}
 	for _, opt := range opts {
@@ -72,6 +76,15 @@ type User struct {
 	Flags       *UserFlag     `json:"flags"`
 	PremiumType *int          `json:"premium_type"`
 	PublicFlags *int          `json:"public_flags"`
+}
+
+// GetCurrentUserGuilds Returns a guild member object for the current user.
+// Requires the guilds.members.read OAuth2 scope.
+//
+// https://discord.com/developers/docs/resources/user#get-current-user-guild-member
+func (d *Discord) GetCurrentUserGuildMember(guildID SnowflakeGuild) (*GuildMember, error) {
+	member := new(GuildMember)
+	return member, d.get("/users/@me/guilds/"+guildID.String()+"/members", member)
 }
 
 // https://discord.com/developers/docs/resources/user#user-object-user-flags

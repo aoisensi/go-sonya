@@ -36,13 +36,13 @@ func (w WithUsername) optModifyCurrentUser(v map[string]interface{}) {
 type WithBefore Snowflake
 
 func (w WithBefore) optGetCurrentUserGuilds(v url.Values) {
-	v.Set("before", string(w))
+	v.Set("before", Snowflake(w).String())
 }
 
 type WithAfter Snowflake
 
 func (w WithAfter) optGetCurrentUserGuilds(v url.Values) {
-	v.Set("after", string(w))
+	v.Set("after", Snowflake(w).String())
 }
 
 type WithLimit int
