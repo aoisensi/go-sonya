@@ -16,7 +16,7 @@ func (s *Discord) GetCurrentUser() (*User, error) {
 // GetUser returns a user object for a given user ID.
 //
 // https://discord.com/developers/docs/resources/user#get-user
-func (s *Discord) GetUser(id SnowflakeUser) (*User, error) {
+func (s *Discord) GetUser(id UserID) (*User, error) {
 	return s.getUser(id.String())
 }
 
@@ -59,30 +59,32 @@ type GetCurrentUserGuildsOption interface {
 	optGetCurrentUserGuilds(v url.Values)
 }
 
-// https://discord.com/developers/docs/resources/user#user-object-user-structure
+// User
+//
+// https://discord.com/developers/docs/resources/user#user-object
 type User struct {
-	ID          SnowflakeUser `json:"id"`
-	Username    string        `json:"username"`
-	Discrim     string        `json:"discriminator"`
-	Avatar      *string       `json:"avatar"`
-	Bot         *bool         `json:"bot"`
-	System      *bool         `json:"system"`
-	MFAEnabled  *bool         `json:"mfa_enabled"`
-	Banner      *string       `json:"banner"`
-	AccentColor *int          `json:"accent_color"`
-	Locale      *string       `json:"locale"`
-	Verified    *bool         `json:"verified"`
-	Email       *string       `json:"email"`
-	Flags       *UserFlag     `json:"flags"`
-	PremiumType *int          `json:"premium_type"`
-	PublicFlags *int          `json:"public_flags"`
+	ID          UserID    `json:"id,string"`
+	Username    string    `json:"username"`
+	Discrim     string    `json:"discriminator"`
+	Avatar      *string   `json:"avatar"`
+	Bot         *bool     `json:"bot"`
+	System      *bool     `json:"system"`
+	MFAEnabled  *bool     `json:"mfa_enabled"`
+	Banner      *string   `json:"banner"`
+	AccentColor *int      `json:"accent_color"`
+	Locale      *string   `json:"locale"`
+	Verified    *bool     `json:"verified"`
+	Email       *string   `json:"email"`
+	Flags       *UserFlag `json:"flags"`
+	PremiumType *int      `json:"premium_type"`
+	PublicFlags *int      `json:"public_flags"`
 }
 
 // GetCurrentUserGuilds Returns a guild member object for the current user.
 // Requires the guilds.members.read OAuth2 scope.
 //
 // https://discord.com/developers/docs/resources/user#get-current-user-guild-member
-func (d *Discord) GetCurrentUserGuildMember(guildID SnowflakeGuild) (*GuildMember, error) {
+func (d *Discord) GetCurrentUserGuildMember(guildID GuildID) (*GuildMember, error) {
 	member := new(GuildMember)
 	return member, d.get("/users/@me/guilds/"+guildID.String()+"/members", member)
 }

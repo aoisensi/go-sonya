@@ -2,6 +2,7 @@ package sonya
 
 import (
 	"encoding/json"
+	"time"
 )
 
 type gwPayload struct {
@@ -13,7 +14,18 @@ type gwPayload struct {
 }
 
 type plHello struct {
-	HeartbeatInterval int `json:"heartbeat_interval"`
+	HeartbeatInterval time.Duration `json:"heartbeat_interval"`
+}
+
+func (p *plHello) UnmarshalJSON(data []byte) error {
+	j := &struct {
+		HeartbeatInterval int64 `json:"heartbeat_interval"`
+	}{}
+	if err := json.Unmarshal(data, &j); err != nil {
+		return err
+	}
+	p.HeartbeatInterval = time.Duration(j.HeartbeatInterval) * time.Millisecond
+	return nil
 }
 
 type plIdentify struct {

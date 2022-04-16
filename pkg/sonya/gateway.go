@@ -2,7 +2,6 @@ package sonya
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/url"
 	"runtime"
 	"strconv"
@@ -13,7 +12,7 @@ import (
 )
 
 // Connect to the gateway
-func (d *Discord) Connect() (*Gateway, error) {
+func (d *Discord) Connect() error {
 	var resp *GetGatewayResponse
 	var err error
 	if d.isBot {
@@ -22,7 +21,7 @@ func (d *Discord) Connect() (*Gateway, error) {
 		resp, err = d.GetGateway()
 	}
 	if err != nil {
-		return nil, err
+		return err
 	}
 	url := resp.URL + "?" + url.Values{
 		"v":        {strconv.Itoa(d.APIVersion)},
@@ -30,23 +29,25 @@ func (d *Discord) Connect() (*Gateway, error) {
 	}.Encode()
 	ws, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	g := &Gateway{ws: ws}
+	g := &gateway{ws: ws, discord: d}
 	data, _, err := g.read()
 	if err != nil {
-		return nil, err
+		return err
 	}
 	hello, ok := data.(*plHello)
 	if !ok {
 		panic("invalid hello")
 	}
-
-	go g.heart(time.Duration(hello.HeartbeatInterval) * time.Millisecond)
+	// wait random time
+	time.Sleep(time.Second)
+	g.sendHeartbeat()
+	go g.heart(hello.HeartbeatInterval)
 
 	data, _, err = g.read()
 	if err != nil {
-		return nil, err
+		return err
 	}
 	_, ok = data.(*plHeartbeatACK)
 	if !ok {
@@ -64,53 +65,53 @@ func (d *Discord) Connect() (*Gateway, error) {
 		Opcode: 2, // Identify
 		Data:   identify,
 	})
-	go g.recieve()
-	return g, nil
+	d.gateway = g
+	return g.recieve()
 }
 
-func (g *Gateway) Close() error {
+func (g *gateway) close() error {
 	err := g.ws.Close()
 	g.ws = nil
 	return err
 }
 
-func (g *Gateway) heart(interval time.Duration) {
-	time.Sleep(interval * 60 / time.Duration(time.Now().Second()+1))
+func (g *gateway) heart(interval time.Duration) {
 	for {
+		time.Sleep(interval)
 		if g.ws == nil {
 			return
 		}
 		g.sendHeartbeat()
-		time.Sleep(interval)
 	}
 }
 
-func (g *Gateway) recieve() {
+func (g *gateway) recieve() error {
 	for {
-		if g.ws == nil {
-			return
-		}
 		data, typ, err := g.read()
 		if err != nil {
-			return
+			return err
 		}
 		switch data.(type) {
 		case *plHeartbeat:
-			g.sendHeartbeat()
+			if err := g.sendHeartbeat(); err != nil {
+				return err
+			}
 			continue
-		case *json.RawMessage:
-			fmt.Println(typ)
+		case json.RawMessage:
+			err := g.discord.dispatch(typ, data.(json.RawMessage))
+			if err != nil {
+				return err
+			}
 			continue
 		}
 	}
 }
 
-func (g *Gateway) read() (interface{}, string, error) {
+func (g *gateway) read() (interface{}, string, error) {
 	pl := new(gwPayload)
 	if err := g.ws.ReadJSON(pl); err != nil {
 		return nil, "", err
 	}
-	fmt.Println("<<<", pl.Opcode)
 	if pl.SequenceNumber != nil {
 		g.seq = pl.SequenceNumber
 	}
@@ -131,14 +132,14 @@ func (g *Gateway) read() (interface{}, string, error) {
 	}
 }
 
-func (g *Gateway) sendHeartbeat() error {
+func (g *gateway) sendHeartbeat() error {
 	return g.send(&gwPayload{
 		Opcode:         1,
 		SequenceNumber: g.seq,
 	})
 }
 
-func (g *Gateway) send(pl *gwPayload) error {
+func (g *gateway) send(pl *gwPayload) error {
 	if pl.DataRaw == nil {
 		data, err := json.Marshal(pl.Data)
 		if err != nil {
@@ -147,13 +148,13 @@ func (g *Gateway) send(pl *gwPayload) error {
 		pl.DataRaw = data
 	}
 	g.mu.Lock()
-	fmt.Println(">>>", pl.Opcode)
 	defer g.mu.Unlock()
 	return g.ws.WriteJSON(pl)
 }
 
-type Gateway struct {
-	ws  *websocket.Conn
-	mu  sync.Mutex
-	seq *int
+type gateway struct {
+	ws      *websocket.Conn
+	mu      sync.Mutex
+	seq     *int
+	discord *Discord
 }

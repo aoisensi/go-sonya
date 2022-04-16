@@ -1,5 +1,7 @@
 package sonya
 
+import "encoding/json"
+
 // GetGateway returns an object with a single valid WSS URL,
 // which the client can use for Connecting.
 // Clients should cache this value and only call this endpoint to retrieve a new URL
@@ -34,4 +36,26 @@ type GetGatewayResponse struct {
 		ResetAfter     int `json:"reset_after"`
 		MaxConcurrency int `json:"max_concurrency"`
 	} `json:"session_start_limit,omitempty"`
+}
+
+func (d *Discord) dispatch(typ string, in []byte) error {
+	switch typ {
+	case "READY":
+		data := new(EventReady)
+		if err := json.Unmarshal(in, data); err != nil {
+			return err
+		}
+		for _, h := range d.hReady {
+			h(d, data)
+		}
+	case "MESSAGE_CREATE":
+		data := new(EventMessageCreate)
+		if err := json.Unmarshal(in, data); err != nil {
+			return err
+		}
+		for _, h := range d.hMessageCreate {
+			h(d, data)
+		}
+	}
+	return nil
 }

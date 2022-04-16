@@ -8,26 +8,38 @@ func (s Snowflake) String() string {
 	return strconv.FormatUint(uint64(s), 10)
 }
 
-type SnowflakeGuild Snowflake
+type GuildID Snowflake
 
-func (s SnowflakeGuild) String() string {
-	return Snowflake(s).String()
+func (id GuildID) String() string {
+	return Snowflake(id).String()
 }
 
-type SnowflakeUser Snowflake
+type UserID Snowflake
 
-func (s SnowflakeUser) String() string {
-	return Snowflake(s).String()
+func (id UserID) String() string {
+	return Snowflake(id).String()
 }
 
-type SnowflakeChannel Snowflake
+type ChannelID Snowflake
 
-func (s SnowflakeChannel) String() string {
-	return Snowflake(s).String()
+func (id ChannelID) String() string {
+	return Snowflake(id).String()
 }
 
-type SnowflakeRole Snowflake
+type RoleID Snowflake
 
-func (s SnowflakeRole) String() string {
-	return Snowflake(s).String()
+func (id RoleID) String() string {
+	return Snowflake(id).String()
+}
+
+type ApplicationID Snowflake
+
+func (id ApplicationID) String() string {
+	return Snowflake(id).String()
+}
+
+type MessageID Snowflake
+
+func (id MessageID) String() string {
+	return Snowflake(id).String()
 }

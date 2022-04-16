@@ -3,7 +3,6 @@ package sonya
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -25,7 +24,6 @@ func (s *Discord) get(path string, v interface{}) error {
 
 func (s *Discord) patch(path string, v interface{}, j interface{}) error {
 	data, _ := json.Marshal(j)
-	fmt.Println(string(data))
 	req, _ := http.NewRequest("PATCH", s.url(path), bytes.NewBuffer(data))
 	req.Header.Set("Authorization", s.authorization())
 	req.Header.Set("Content-Type", "application/json")
