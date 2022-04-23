@@ -43,3 +43,9 @@ type MessageID Snowflake
 func (id MessageID) String() string {
 	return Snowflake(id).String()
 }
+
+type EmojiID Snowflake
+
+func (id EmojiID) String() string {
+	return Snowflake(id).String()
+}
