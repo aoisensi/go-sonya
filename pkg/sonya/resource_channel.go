@@ -2,6 +2,28 @@ package sonya
 
 import "time"
 
+// https://discord.com/developers/docs/resources/channel#channel-object-channel-types
+type ChannelType int
+
+const (
+	ChannelTypeGuildText ChannelType = iota
+	ChannelTypeDM
+	ChannelTypeGuildVoice
+	ChannelTypeGroupDM
+	ChannelTypeGuildCategory
+	ChannelTypeGuildNews
+	_
+	_
+	_
+	_
+	ChannelTypeGuildNewsThread
+	ChannelTypeGubldPublicThread
+	ChannelTypeGuildPrivateThread
+	ChannelTypeGuildStageVoice
+	ChannelTypeGuildDirectory
+	ChannelTypeGuildForum
+)
+
 // Message
 // Represents a message sent in a channel within Discord.
 //

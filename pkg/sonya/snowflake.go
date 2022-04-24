@@ -49,3 +49,9 @@ type EmojiID Snowflake
 func (id EmojiID) String() string {
 	return Snowflake(id).String()
 }
+
+type ApplicationCommandID Snowflake
+
+func (id ApplicationCommandID) String() string {
+	return Snowflake(id).String()
+}
