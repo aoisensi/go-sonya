@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gollira/websocket"
+	"github.com/gorilla/websocket"
 )
 
 // Connect to the gateway
