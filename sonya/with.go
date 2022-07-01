@@ -14,7 +14,7 @@ import (
 
 type WithAvatar []byte
 
-func (w WithAvatar) optModifyCurrentUser(v map[string]interface{}) {
+func (w WithAvatar) optModifyCurrentUser(v map[string]any) {
 	buf := bytes.NewBuffer(w)
 	_, format, err := image.DecodeConfig(buf)
 	if err != nil {
@@ -29,20 +29,20 @@ func (w WithAvatar) optModifyCurrentUser(v map[string]interface{}) {
 
 type WithUsername string
 
-func (w WithUsername) optModifyCurrentUser(v map[string]interface{}) {
+func (w WithUsername) optModifyCurrentUser(v map[string]any) {
 	v["username"] = string(w)
 }
 
 type WithBefore Snowflake
 
 func (w WithBefore) optGetCurrentUserGuilds(v url.Values) {
-	v.Set("before", Snowflake(w).String())
+	v.Set("before", string(w))
 }
 
 type WithAfter Snowflake
 
 func (w WithAfter) optGetCurrentUserGuilds(v url.Values) {
-	v.Set("after", Snowflake(w).String())
+	v.Set("after", string(w))
 }
 
 type WithLimit int

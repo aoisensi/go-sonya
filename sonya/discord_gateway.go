@@ -45,16 +45,16 @@ func (d *Discord) dispatch(typ string, in []byte) error {
 		if err := json.Unmarshal(in, data); err != nil {
 			return err
 		}
-		for _, h := range d.hReady {
-			h(d, data)
+		for _, h := range d.handlers.Ready {
+			go h(d, data)
 		}
 	case "MESSAGE_CREATE":
 		data := new(EventMessageCreate)
 		if err := json.Unmarshal(in, data); err != nil {
 			return err
 		}
-		for _, h := range d.hMessageCreate {
-			h(d, data)
+		for _, h := range d.handlers.MessageCreate {
+			go h(d, data)
 		}
 	}
 	return nil

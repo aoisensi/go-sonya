@@ -91,14 +91,14 @@ func (g *gateway) recieve() error {
 		if err != nil {
 			return err
 		}
-		switch data.(type) {
+		switch data := data.(type) {
 		case *plHeartbeat:
 			if err := g.sendHeartbeat(); err != nil {
 				return err
 			}
 			continue
 		case json.RawMessage:
-			err := g.discord.dispatch(typ, data.(json.RawMessage))
+			err := g.discord.dispatch(typ, data)
 			if err != nil {
 				return err
 			}
@@ -107,7 +107,7 @@ func (g *gateway) recieve() error {
 	}
 }
 
-func (g *gateway) read() (interface{}, string, error) {
+func (g *gateway) read() (any, string, error) {
 	pl := new(gwPayload)
 	if err := g.ws.ReadJSON(pl); err != nil {
 		return nil, "", err

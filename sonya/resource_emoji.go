@@ -4,7 +4,7 @@ import "fmt"
 
 // https://discord.com/developers/docs/resources/emoji#emoji-object
 type Emoji struct {
-	ID            *EmojiID `json:"id,string"`
+	ID            *EmojiID `json:"id"`
 	Name          *string  `json:"name"`
 	Roles         []RoleID `json:"roles"`
 	User          *User    `json:"user"`

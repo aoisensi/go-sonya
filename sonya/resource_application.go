@@ -2,7 +2,7 @@ package sonya
 
 // https://discord.com/developers/docs/resources/application#application-object
 type Application struct {
-	ID                  ApplicationID `json:"id,string"`
+	ID                  ApplicationID `json:"id"`
 	Name                string        `json:"name"`
 	Icon                *string       `json:"icon"`
 	Description         string        `json:"description"`
@@ -14,7 +14,7 @@ type Application struct {
 	Owner               *User         `json:"owner"`
 	VerifyKey           string
 	//Team //TODO
-	GuildID *GuildID `json:"guild_id,string"`
+	GuildID *GuildID `json:"guild_id"`
 	//PrimarySKUID //TODO
 	Slug       *string  `json:"slug"`
 	CoverImage *string  `json:"cover_image"`

@@ -10,7 +10,7 @@ type gwPayload struct {
 	DataRaw        json.RawMessage `json:"d"`
 	SequenceNumber *int            `json:"s,omitempty"`
 	Type           *string         `json:"t,omitempty"`
-	Data           interface{}     `json:"-"`
+	Data           any             `json:"-"`
 }
 
 type plHello struct {

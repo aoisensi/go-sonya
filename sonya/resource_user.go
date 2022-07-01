@@ -17,7 +17,7 @@ func (s *Discord) GetCurrentUser() (*User, error) {
 //
 // https://discord.com/developers/docs/resources/user#get-user
 func (s *Discord) GetUser(id UserID) (*User, error) {
-	return s.getUser(id.String())
+	return s.getUser(string(id))
 }
 
 func (s *Discord) getUser(id string) (*User, error) {
@@ -31,7 +31,7 @@ func (s *Discord) getUser(id string) (*User, error) {
 // https://discord.com/developers/docs/resources/user#modify-current-user
 func (s *Discord) ModifyCurrentUser(opts ...ModifyCurrentUserOption) (*User, error) {
 	user := new(User)
-	j := make(map[string]interface{})
+	j := make(map[string]any)
 	for _, opt := range opts {
 		opt.optModifyCurrentUser(j)
 	}
@@ -39,7 +39,7 @@ func (s *Discord) ModifyCurrentUser(opts ...ModifyCurrentUserOption) (*User, err
 }
 
 type ModifyCurrentUserOption interface {
-	optModifyCurrentUser(v map[string]interface{})
+	optModifyCurrentUser(v map[string]any)
 }
 
 // GetCurrentUserGuilds returns a list of partial guild objects the current user is a member of.
@@ -63,7 +63,7 @@ type GetCurrentUserGuildsOption interface {
 //
 // https://discord.com/developers/docs/resources/user#user-object
 type User struct {
-	ID          UserID    `json:"id,string"`
+	ID          UserID    `json:"id"`
 	Username    string    `json:"username"`
 	Discrim     string    `json:"discriminator"`
 	Avatar      *string   `json:"avatar"`
@@ -86,7 +86,7 @@ type User struct {
 // https://discord.com/developers/docs/resources/user#get-current-user-guild-member
 func (d *Discord) GetCurrentUserGuildMember(guildID GuildID) (*GuildMember, error) {
 	member := new(GuildMember)
-	return member, d.get("/users/@me/guilds/"+guildID.String()+"/members", member)
+	return member, d.get("/users/@me/guilds/"+string(guildID)+"/members", member)
 }
 
 // https://discord.com/developers/docs/resources/user#user-object-user-flags
