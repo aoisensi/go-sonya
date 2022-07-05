@@ -81,11 +81,23 @@ type Message struct {
 	//keep going... TODO
 }
 
+// GetChannel
+// Get a channel by ID. Returns a channel object. If the channel is a thread,
+// a thread member object is included in the returned result.
+//
+// https://discord.com/developers/docs/resources/channel#get-channel
 func (d *Discord) GetChannel(channelID ChannelID) (*Channel, error) {
 	channel := new(Channel)
 	return channel, d.get("/channels/"+string(channelID), channel)
 }
 
+// CreateMessage
+// Post a message to a guild text or DM channel.
+// Returns a message object.
+// Fires a Message Create Gateway event.
+// See message formatting for more information on how to properly format messages.
+//
+// https://discord.com/developers/docs/resources/channel#create-message
 func (d *Discord) CreateMessage(channelID ChannelID, message *MessageParams) (*Message, error) {
 	mes := new(Message)
 	return mes, d.post("/channels/"+string(channelID)+"/messages", mes, message)
@@ -94,4 +106,16 @@ func (d *Discord) CreateMessage(channelID ChannelID, message *MessageParams) (*M
 type MessageParams struct {
 	Content string `json:"content,omitempty"`
 	// TODO
+}
+
+// DeleteMessage
+// Delete a message.
+// If operating on a guild channel and trying to delete a message that was not sent by the current user,
+// this endpoint requires the MANAGE_MESSAGES permission.
+// Returns a 204 empty response on success.
+// Fires a Message Delete Gateway event.
+//
+// https://discord.com/developers/docs/resources/channel#delete-message
+func (d *Discord) DeleteMessage(channelID ChannelID, messageID MessageID) error {
+	return d.delete("/channels/"+string(channelID)+"/messages/"+string(messageID), nil)
 }

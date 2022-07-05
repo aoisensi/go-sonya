@@ -88,3 +88,12 @@ type UnavailableGuild struct {
 	ID          GuildID `json:"id"`
 	Unavailable bool    `json:"unavailable"`
 }
+
+func (d *Discord) GetGuildRoles(guildID GuildID) ([]*Role, error) {
+	roles := make([]*Role, 0)
+	return roles, d.get("/guilds/"+string(guildID)+"/roles", &roles)
+}
+
+func (d *Discord) DeleteGuildRole(guildID GuildID, roleID RoleID) error {
+	return d.delete("/guilds/"+string(guildID)+"/roles/"+string(roleID), nil)
+}

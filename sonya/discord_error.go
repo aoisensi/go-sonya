@@ -1,5 +1,7 @@
 package sonya
 
+import "fmt"
+
 type ErrorResponse struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
@@ -7,5 +9,5 @@ type ErrorResponse struct {
 }
 
 func (e ErrorResponse) Error() string {
-	return e.Message
+	return fmt.Sprintf("sonya: discord returned error response: #%v %v", e.Code, e.Message)
 }

@@ -3,6 +3,7 @@ package sonya
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -13,7 +14,7 @@ func (s *Discord) get(path string, v any) error {
 	req.Header.Set("Authorization", s.authorization())
 	resp, err := s.HTTPClient.Do(req)
 	if err != nil {
-		return err
+		return fmt.Errorf("sonya: %v", err)
 	}
 	defer resp.Body.Close()
 	if 200 > resp.StatusCode || resp.StatusCode >= 300 {
@@ -29,7 +30,7 @@ func (s *Discord) post(path string, vo any, vi any) error {
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := s.HTTPClient.Do(req)
 	if err != nil {
-		return err
+		return fmt.Errorf("sonya: %v", err)
 	}
 	defer resp.Body.Close()
 	if 200 > resp.StatusCode || resp.StatusCode >= 300 {
@@ -45,11 +46,29 @@ func (s *Discord) patch(path string, vo any, vi any) error {
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := s.HTTPClient.Do(req)
 	if err != nil {
-		return err
+		return fmt.Errorf("sonya: %v", err)
 	}
 	defer resp.Body.Close()
 	if 200 > resp.StatusCode || resp.StatusCode >= 300 {
 		return s.errors(resp)
+	}
+	return json.NewDecoder(resp.Body).Decode(vo)
+}
+
+func (s *Discord) delete(path string, vo any) error {
+	fmt.Println(path)
+	req, _ := http.NewRequest("DELETE", s.url(path), nil)
+	req.Header.Set("Authorization", s.authorization())
+	resp, err := s.HTTPClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("sonya: %v", err)
+	}
+	defer resp.Body.Close()
+	if 200 > resp.StatusCode || resp.StatusCode >= 300 {
+		return s.errors(resp)
+	}
+	if resp.StatusCode == 204 {
+		return nil
 	}
 	return json.NewDecoder(resp.Body).Decode(vo)
 }
